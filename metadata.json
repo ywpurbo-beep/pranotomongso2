@@ -1,6 +1,6 @@
 {
   "name": "Kawuruh Pranoto Mongso",
-  "description": "Aplikasi interaktif kalender pertanian tradisional Jawa (Pranata Mangsa) dengan panduan cuaca, sasmita alam, dan analisis observasi berbasis kecerdasan buatan.",
-  "requestFramePermissions": [],
+  "description": "Aplikasi interaktif kalender pertanian tradisional Jawa (Pranata Mangsa) v0.8.4 dengan panduan cuaca, sasmita alam, dan analisis observasi berbasis kecerdasan buatan.",
+  "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

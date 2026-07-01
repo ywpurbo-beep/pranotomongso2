@@ -31,14 +31,14 @@ export default function AiAnalysisView({
           </div>
         </div>
 
-        {!isLoading && hasObservations && (
+        {!isLoading && (
           <button
             id="trigger-analysis-btn"
             onClick={onTriggerAnalysis}
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold tracking-wider text-white bg-editorial-text hover:bg-editorial-accent rounded-lg transition-all shadow-sm"
           >
             <Compass className="w-3.5 h-3.5" />
-            <span>MULAI ANALISIS</span>
+            <span>{hasObservations ? "MULAI ANALISIS" : "RINGKASAN MANGSA"}</span>
           </button>
         )}
       </div>
@@ -163,21 +163,19 @@ export default function AiAnalysisView({
             </div>
             <div className="space-y-2 max-w-md">
               <p className="text-base font-serif font-bold text-editorial-text">Peta Keselarasan Alam Belum Diuji</p>
-              <p className="text-xs text-editorial-accent leading-relaxed">
+              <p className="text-xs text-editorial-accent leading-relaxed font-sans">
                 {hasObservations 
-                  ? "Anda telah mencatat sasmita alam! Klik tombol 'Mulai Analisis' di atas untuk berkonsultasi dengan Kaki Pranata Mangsa bertenaga AI."
-                  : "Silakan tambahkan beberapa observasi gejala alam (sasmita angin, awan, fauna, atau flora) di bawah terlebih dahulu untuk mengaktifkan analisis AI kearifan lokal."}
+                  ? "Anda telah mencatat sasmita alam! Klik tombol 'Mulai Analisis' di atas untuk menganalisis keselarasan kondisi lingkungan lokal bertenaga AI."
+                  : "Belum ada catatan observasi pribadi. Anda bisa mencatat sasmita angin, awan, satwa, atau flora di bawah, atau klik tombol di bawah untuk langsung memunculkan ringkasan karakteristik aslinya dari Kaki Pranata Mangsa AI."}
               </p>
             </div>
-            {hasObservations && (
-              <button
-                id="empty-trigger-analysis-btn"
-                onClick={onTriggerAnalysis}
-                className="px-5 py-2.5 text-xs font-bold tracking-widest text-white bg-editorial-text hover:bg-editorial-accent rounded-lg transition-all shadow-sm uppercase"
-              >
-                Analisis Sasmita Saya
-              </button>
-            )}
+            <button
+              id="empty-trigger-analysis-btn"
+              onClick={onTriggerAnalysis}
+              className="px-5 py-2.5 text-xs font-bold tracking-widest text-white bg-editorial-text hover:bg-editorial-accent rounded-lg transition-all shadow-sm uppercase font-sans"
+            >
+              {hasObservations ? "Analisis Sasmita Saya" : "Lihat Ringkasan Mangsa (AI)"}
+            </button>
           </div>
         )}
       </div>

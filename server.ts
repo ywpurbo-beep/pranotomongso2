@@ -37,10 +37,6 @@ async function startServer() {
         return res.status(400).json({ error: "Data observasi tidak valid." });
       }
 
-      if (observations.length === 0) {
-        return res.status(400).json({ error: "Silakan tambahkan setidaknya satu observasi terlebih dahulu." });
-      }
-
       let aiClient;
       try {
         aiClient = getGeminiClient();
@@ -48,26 +44,38 @@ async function startServer() {
         return res.status(400).json({ error: err.message });
       }
 
-      const obsText = observations.map((o: any, idx: number) => {
-        return `${idx + 1}. Kategori: ${o.category}, Deskripsi: ${o.description}, Tanggal: ${o.date || 'Hari ini'}`;
-      }).join("\n");
+      // Limit to 4 most recent observations to avoid cluttering AI context with old logs
+      const recentObservations = observations.slice(0, 4);
+
+      let obsText = "";
+      let hasObs = recentObservations.length > 0;
+
+      if (hasObs) {
+        obsText = recentObservations.map((o: any, idx: number) => {
+          return `${idx + 1}. Kategori: ${o.category}, Deskripsi: ${o.description}, Tanggal: ${o.date || 'Hari ini'}`;
+        }).join("\n");
+      } else {
+        obsText = "Tidak ada observasi lokal spesifik yang dicatat oleh pengguna saat ini.";
+      }
 
       const prompt = `Anda adalah seorang ahli pertanian tradisional Jawa (Kaki Pranata Mangsa) yang bijaksana. 
-Masyarakat lokal telah mencatat beberapa observasi gejala alam (Sasmita/tanda-tanda alam) saat ini:
-
-${obsText}
+Masyarakat lokal ingin mendapatkan ringkasan dan analisis kearifan lokal mengenai kondisi musim saat ini:
 
 Mangsa (Musim tradisional) yang sedang aktif saat ini menurut kalender adalah: **Mangsa ${currentMangsa.name}** (${currentMangsa.translation || ''}) yang bercirikan secara umum: "${currentMangsa.description}".
 Sasmita (Tanda) tradisional mangsa ini adalah: "${currentMangsa.sasmita || 'Tidak ada'}".
 
-Tugas Anda adalah memberikan analisis ramah, mendalam, dan puitis khas budaya Jawa mengenai observasi tersebut:
-1. Analisis apakah tanda-tanda alam yang dicatat oleh pengguna (arah angin, bentuk awan, perilaku hewan, kondisi tanaman) selaras dengan karakteristik Mangsa ${currentMangsa.name} saat ini.
-2. Berikan penjelasan kearifan lokal pertanian tradisional Jawa mengenai makna dari kombinasi tanda-tanda tersebut bagi kegiatan bertani saat ini (misalnya persiapan tanah, penyemaian, penanaman padi/palawija, penyiangan, atau pemanenan).
+Observasi lokal saat ini:
+${obsText}
+
+Tugas Anda adalah memberikan analisis ramah, mendalam, dan puitis khas budaya Jawa mengenai musim ini:
+${hasObs ? `1. Analisis apakah tanda-tanda alam yang dicatat oleh pengguna (arah angin, bentuk awan, perilaku hewan, kondisi tanaman) selaras dengan karakteristik Mangsa ${currentMangsa.name} saat ini.
+2. Berikan penjelasan kearifan lokal pertanian tradisional Jawa mengenai makna dari kombinasi tanda-tanda tersebut bagi kegiatan bertani saat ini (misalnya persiapan tanah, penyemaian, penanaman padi/palawija, penyiangan, atau pemanenan).` : `1. Karena tidak ada observasi lokal khusus yang dicatat pengguna, berikan ringkasan murni mengenai esensi dari Mangsa ${currentMangsa.name} ini beserta tanda-tanda alam (sasmita) alamiahnya yang patut diperhatikan.
+2. Jelaskan kearifan lokal pertanian tradisional Jawa mengenai makna rohaniah dan jasmaniah dari musim ini bagi kegiatan pertanian.`}
 3. Berikan saran praktis & bijaksana untuk langkah bercocok tanam atau kegiatan sehari-hari yang selaras dengan irama alam (misal menghemat air, bersiap menghadapi hujan deras, menjaga kesuburan dsb).
 
 Format output harus berupa JSON terstruktur yang elegan dengan skema berikut:
 {
-  "harmonyScore": 85, // Angka 0-100 seberapa selaras observasi pengguna dengan mangsa aktif
+  "harmonyScore": ${hasObs ? '85' : '100'}, // Angka 0-100 seberapa selaras observasi pengguna dengan mangsa aktif (jika tidak ada observasi, berikan nilai 100 sebagai harmoni dasar alam semesta)
   "alignmentAnalysis": "Kalimat penjelasan keselarasan tanda alam...",
   "localWisdom": "Penjelasan kearifan lokal mengenai kondisi alam saat ini...",
   "agriculturalAdvice": "Saran praktis bercocok tanam yang bijak...",

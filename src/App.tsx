@@ -22,14 +22,29 @@ import { MANGSAS_DATA, INITIAL_OBSERVATIONS } from './data';
 import HeaderSection from './components/HeaderSection';
 import AddObservationModal from './components/AddObservationModal';
 import AiAnalysisView from './components/AiAnalysisView';
+import { getMangsaForDate, getStartDateForMangsa, formatDateToYYYYMMDD } from './utils/dateUtils';
+
+interface RealtimeWeather {
+  temp: string;
+  wind: string;
+  humidity: string;
+  rainfall: string;
+  skyCondition: string;
+  locationName: string;
+}
 
 export default function App() {
   // 1. Core States
-  const [activeMangsa, setActiveMangsa] = useState<Mangsa>(MANGSAS_DATA[0]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [activeMangsa, setActiveMangsa] = useState<Mangsa>(getMangsaForDate(new Date()));
   const [observations, setObservations] = useState<Observation[]>([]);
   const [scrollY, setScrollY] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
+  // Realtime Weather State
+  const [realtimeWeather, setRealtimeWeather] = useState<RealtimeWeather | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+
   // AI analysis state
   const [aiAnalysis, setAiAnalysis] = useState<AiAnalysisResult | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -57,6 +72,86 @@ export default function App() {
         setAiAnalysis(null);
       }
     }
+  }, []);
+
+  // Realtime weather effect using Geolocation & Open-Meteo
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+
+    setWeatherLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,rain,weather_code,wind_speed_10m,wind_direction_10m`;
+          const weatherRes = await fetch(weatherUrl);
+          if (!weatherRes.ok) throw new Error();
+          const weatherData = await weatherRes.json();
+          const cur = weatherData.current;
+
+          const getWindDirectionIndonesian = (deg: number): string => {
+            if (deg >= 337.5 || deg < 22.5) return "Utara";
+            if (deg >= 22.5 && deg < 67.5) return "Timur Laut";
+            if (deg >= 67.5 && deg < 112.5) return "Timur";
+            if (deg >= 112.5 && deg < 157.5) return "Tenggara";
+            if (deg >= 157.5 && deg < 202.5) return "Selatan";
+            if (deg >= 202.5 && deg < 247.5) return "Barat Daya";
+            if (deg >= 247.5 && deg < 292.5) return "Barat";
+            if (deg >= 292.5 && deg < 337.5) return "Barat Laut";
+            return "Timur";
+          };
+
+          const getSkyConditionIndonesian = (code: number): string => {
+            switch (code) {
+              case 0: return "Cerah Benderang";
+              case 1: case 2: case 3: return "Cerah Berawan";
+              case 45: case 48: return "Berkabut";
+              case 51: case 53: case 55: return "Gerimis Tipis";
+              case 61: case 63: case 65: return "Hujan";
+              case 80: case 81: case 82: return "Hujan Deras";
+              case 95: case 96: case 99: return "Hujan Badai & Guntur";
+              default: return "Berawan";
+            }
+          };
+
+          let locationName = `Kab. Sleman (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`;
+          try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`, {
+              headers: {
+                'Accept-Language': 'id-ID,id;q=0.9,en;q=0.8'
+              }
+            });
+            if (geoRes.ok) {
+              const geoData = await geoRes.json();
+              const city = geoData.address?.city || geoData.address?.town || geoData.address?.municipality || geoData.address?.county || geoData.address?.state;
+              if (city) {
+                locationName = `${city} (${latitude.toFixed(1)}°, ${longitude.toFixed(1)}°)`;
+              }
+            }
+          } catch (e) {
+            // ignore nominatim failure, fallback works fine
+          }
+
+          setRealtimeWeather({
+            temp: `${Math.round(cur.temperature_2m)}°C`,
+            wind: `${Math.round(cur.wind_speed_10m)} km/j ${getWindDirectionIndonesian(cur.wind_direction_10m)}`,
+            humidity: `${cur.relative_humidity_2m}%`,
+            rainfall: `${cur.rain} mm`,
+            skyCondition: getSkyConditionIndonesian(cur.weather_code),
+            locationName
+          });
+        } catch (err) {
+          console.error("Gagal memperbarui cuaca realtime", err);
+        } finally {
+          setWeatherLoading(false);
+        }
+      },
+      (error) => {
+        console.warn("Akses lokasi tidak diizinkan", error);
+        setWeatherLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   }, []);
 
   // Update localStorage when observations change
@@ -181,13 +276,31 @@ export default function App() {
         
         {/* Mangsa Saat Ini Card */}
         <section id="current-mangsa-section" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-editorial-text">
-              Pranata Mangsa Aktif
-            </h2>
-            <span className="text-[10px] font-mono tracking-widest text-editorial-accent bg-editorial-card border border-editorial-border/80 px-3 py-1.5 rounded-md font-bold uppercase">
-              SIKLUS: TAHUNAN JAWA
-            </span>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-editorial-text">
+                Pranata Mangsa Aktif
+              </h2>
+              <p className="text-xs text-editorial-accent font-serif italic mt-0.5">Sistem pranata mangsa Jawa diselaraskan dengan penanggalan masehi</p>
+            </div>
+            
+            <div className="flex items-center gap-2 self-start md:self-auto">
+              <span className="text-[10px] font-mono font-bold text-editorial-accent tracking-wider uppercase hidden sm:inline">PILIH TANGGAL:</span>
+              <div className="flex items-center gap-2 bg-white border border-editorial-border rounded-xl px-3 py-2 shadow-sm">
+                <Calendar className="w-4 h-4 text-editorial-accent" />
+                <input 
+                  type="date"
+                  value={formatDateToYYYYMMDD(selectedDate)}
+                  onChange={(e) => {
+                    const newDate = e.target.value ? new Date(e.target.value) : new Date();
+                    setSelectedDate(newDate);
+                    const newMangsa = getMangsaForDate(newDate);
+                    setActiveMangsa(newMangsa);
+                  }}
+                  className="bg-transparent text-xs text-editorial-text font-mono font-bold outline-none cursor-pointer"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -222,14 +335,14 @@ export default function App() {
                   <p className="font-serif text-lg font-bold italic text-editorial-text leading-tight">
                     &ldquo;{activeMangsa.candra}&rdquo;
                   </p>
-                  <p className="text-xs text-editorial-accent leading-relaxed font-light">
+                  <p className="text-xs text-editorial-accent leading-relaxed font-light font-serif">
                     {activeMangsa.candraMeaning}
                   </p>
                 </div>
 
                 <div className="space-y-1">
                   <span className="text-[9px] font-mono tracking-[0.2em] font-bold text-editorial-accent uppercase">SASMITA (PANDUAN ALAM)</span>
-                  <p className="text-sm text-editorial-text leading-relaxed font-sans">
+                  <p className="text-sm text-editorial-text leading-relaxed font-sans font-light">
                     {activeMangsa.sasmita}
                   </p>
                 </div>
@@ -251,7 +364,18 @@ export default function App() {
                   <span className="text-[10px] font-mono font-bold text-editorial-text/80 tracking-widest uppercase">
                     RINGKASAN IRAMA CUACA
                   </span>
-                  <span className="text-[9px] text-editorial-accent font-mono">Pagi Hari</span>
+                  {realtimeWeather ? (
+                    <span className="text-[9px] text-emerald-600 font-mono font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      REALTIME LOKASI
+                    </span>
+                  ) : weatherLoading ? (
+                    <span className="text-[9px] text-editorial-accent font-mono animate-pulse">
+                      MENDAPATKAN LOKASI...
+                    </span>
+                  ) : (
+                    <span className="text-[9px] text-editorial-accent font-mono">ESTIMASI MUSIM</span>
+                  )}
                 </div>
 
                 {/* Grid items */}
@@ -263,8 +387,12 @@ export default function App() {
                       <span>Cuaca</span>
                     </div>
                     <div>
-                      <p className="text-xl font-bold font-serif text-editorial-text">{activeMangsa.weather.temp}</p>
-                      <p className="text-[10px] text-editorial-accent font-serif italic">{activeMangsa.weather.skyCondition}</p>
+                      <p className="text-xl font-bold font-serif text-editorial-text">
+                        {realtimeWeather ? realtimeWeather.temp : activeMangsa.weather.temp}
+                      </p>
+                      <p className="text-[10px] text-editorial-accent font-serif italic line-clamp-1">
+                        {realtimeWeather ? realtimeWeather.skyCondition : activeMangsa.weather.skyCondition}
+                      </p>
                     </div>
                   </div>
 
@@ -275,8 +403,10 @@ export default function App() {
                       <span>Angin</span>
                     </div>
                     <div>
-                      <p className="text-xl font-bold font-serif text-editorial-text">{activeMangsa.weather.wind}</p>
-                      <p className="text-[10px] text-editorial-accent">Embusan</p>
+                      <p className="text-sm font-bold font-serif text-editorial-text leading-tight mt-0.5">
+                        {realtimeWeather ? realtimeWeather.wind : activeMangsa.weather.wind}
+                      </p>
+                      <p className="text-[9px] text-editorial-accent">Arah Hembusan</p>
                     </div>
                   </div>
 
@@ -287,8 +417,10 @@ export default function App() {
                       <span>Kelembapan</span>
                     </div>
                     <div>
-                      <p className="text-xl font-bold font-serif text-editorial-text">{activeMangsa.weather.humidity}</p>
-                      <p className="text-[10px] text-editorial-accent">Lembap</p>
+                      <p className="text-xl font-bold font-serif text-editorial-text">
+                        {realtimeWeather ? realtimeWeather.humidity : activeMangsa.weather.humidity}
+                      </p>
+                      <p className="text-[10px] text-editorial-accent">Kadar Lembap</p>
                     </div>
                   </div>
 
@@ -299,17 +431,34 @@ export default function App() {
                       <span>Hujan</span>
                     </div>
                     <div>
-                      <p className="text-xl font-bold font-serif text-editorial-text">{activeMangsa.weather.rainfall}</p>
-                      <p className="text-[10px] text-editorial-accent">{parseInt(activeMangsa.weather.rainfall) > 50 ? 'Curah Tinggi' : 'Curah Rendah'}</p>
+                      <p className="text-xl font-bold font-serif text-editorial-text">
+                        {realtimeWeather ? realtimeWeather.rainfall : activeMangsa.weather.rainfall}
+                      </p>
+                      <p className="text-[10px] text-editorial-accent">
+                        {realtimeWeather 
+                          ? (parseFloat(realtimeWeather.rainfall) > 0 ? 'Sedang Basah' : 'Tanpa Curahan')
+                          : (parseInt(activeMangsa.weather.rainfall) > 50 ? 'Curah Tinggi' : 'Curah Rendah')}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3 bg-[#FBF9F6] border border-dashed border-editorial-border rounded-xl text-center">
-                  <p className="text-[10px] font-mono text-editorial-accent leading-relaxed">
-                    Suhu malam cenderung sejuk, dipengaruhi gerak udara siklus tahunan Jawa.
-                  </p>
-                </div>
+                {realtimeWeather ? (
+                  <div className="p-3 bg-emerald-50/50 border border-dashed border-emerald-200/80 rounded-xl text-center">
+                    <p className="text-[9.5px] font-mono text-emerald-800 font-bold uppercase tracking-wider">
+                      LOKASI: {realtimeWeather.locationName}
+                    </p>
+                    <p className="text-[9px] text-emerald-700/80 font-sans mt-0.5">
+                      Prakiraan disinkronkan otomatis melalui satelit lokasi Anda.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-[#FBF9F6] border border-dashed border-editorial-border rounded-xl text-center">
+                    <p className="text-[10px] font-mono text-editorial-accent leading-relaxed">
+                      Suhu cenderung sejuk, dipengaruhi gerak matahari dan siklus tahunan Jawa.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -476,6 +625,8 @@ export default function App() {
                   id={`select-mangsa-${mangsa.id}`}
                   onClick={() => {
                     setActiveMangsa(mangsa);
+                    const startDate = getStartDateForMangsa(mangsa.id);
+                    setSelectedDate(startDate);
                     // Scroll back to top slightly so they see the header change
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
@@ -534,12 +685,12 @@ export default function App() {
         </section>
 
         {/* Footer info banner */}
-        <footer className="text-center text-editorial-accent/60 text-[10px] font-mono pt-12 pb-6 border-t border-editorial-border/60 space-y-1 max-w-xl mx-auto">
+        <footer className="text-center text-editorial-accent/60 text-[10px] font-mono pt-12 pb-6 border-t border-editorial-border/60 space-y-1.5 max-w-xl mx-auto leading-relaxed">
           <p className="font-semibold text-editorial-accent/85">
-            Berakar pada Kecerdasan Leluhur Jawa Nusantara.
+            Dirancang berdasarkan kecerdasan leluhur yang diwariskan melalui kearifan Pranata Mangsa Nusantara.
           </p>
           <p className="text-[9px] text-editorial-accent/50">
-            Disempurnakan dengan bantuan Kecerdasan Buatan Gemini 3.5 Flash dan ChatGPT GPT-5.5 Thinking.
+            Dikembangkan dengan bantuan Artificial Intelligence menggunakan Google Gemini 3.5 Flash dan OpenAI ChatGPT GPT-5.5.
           </p>
         </footer>
       </main>
