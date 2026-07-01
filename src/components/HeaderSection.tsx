@@ -73,7 +73,7 @@ export default function HeaderSection({ activeMangsa, scrollY, onExploreClick }:
             </div>
             <div>
               <h1 className="text-lg font-serif font-bold text-editorial-text tracking-wide">
-                Pranoto Mongso Explorer
+                Kawuruh Pranoto Mongso
               </h1>
               <p className="text-[9px] text-editorial-accent font-mono tracking-widest uppercase">
                 MANGSA {activeMangsa.name} • {activeMangsa.javaneseName}
@@ -83,7 +83,7 @@ export default function HeaderSection({ activeMangsa, scrollY, onExploreClick }:
           
           <div className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-editorial-text bg-editorial-bg px-3 py-1 rounded-full border border-editorial-border">
             <Leaf className="w-3.5 h-3.5 text-editorial-accent" />
-            <span className="font-serif italic">Hari ke-18</span>
+            <span className="font-serif italic">{activeMangsa.dates}</span>
           </div>
         </motion.div>
       )}
@@ -106,12 +106,12 @@ export default function HeaderSection({ activeMangsa, scrollY, onExploreClick }:
 
           {/* Core Title */}
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-editorial-text tracking-tight">
-            Pranoto Mongso Explorer
+            Kawuruh Pranoto Mongso
           </h1>
           
           {/* Subtitle */}
           <p className="mt-1.5 text-base text-editorial-accent font-serif italic max-w-lg leading-relaxed">
-            Mengamati alam, memahami ritme kehidupan, dan selaras dengan warisan kearifan luhur nusantara.
+            Aplikasi berbasis sistem Pranata Mangsa Jawa untuk mengamati alam, memahami ritme kehidupan, dan hidup selaras dengan warisan kearifan luhur nusantara.
           </p>
 
           {/* Quick Stats Indicator */}

@@ -22,6 +22,7 @@ export interface Mangsa {
   weather: WeatherMetrics;
   imageUrl: string;
   themeColor: string; // Tailwind color e.g., 'amber', 'emerald', 'cyan', 'rose'
+  seasonPhase?: string; // e.g., 'Kemarau', 'Labuh', 'Rendheng', 'Mareng'
 }
 
 export interface Observation {

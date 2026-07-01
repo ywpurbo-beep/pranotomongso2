@@ -209,7 +209,7 @@ export default function App() {
                   </div>
                   <div className="text-right">
                     <span className="inline-block px-2.5 py-1 rounded bg-white border border-editorial-border text-[10px] font-mono font-bold text-editorial-text tracking-wide uppercase">
-                      Hari ke-18 dari {activeMangsa.duration} Hari
+                      Durasi: {activeMangsa.duration} Hari
                     </span>
                   </div>
                 </div>
@@ -463,7 +463,7 @@ export default function App() {
             </div>
             <span className="text-[10px] font-mono tracking-widest text-editorial-accent bg-editorial-card border border-editorial-border px-3 py-1.5 rounded-md uppercase font-bold flex items-center gap-1.5">
               <Compass className="w-3.5 h-3.5" />
-              6 SIKLUS INTI
+              12 MANGSA
             </span>
           </div>
 
@@ -534,12 +534,12 @@ export default function App() {
         </section>
 
         {/* Footer info banner */}
-        <footer className="text-center text-editorial-accent text-[11px] font-mono pt-10 border-t border-editorial-border/60 space-y-2">
-          <p>
-            Pranoto Mongso Explorer © 2026 • Dirancang selaras dengan kearifan adat suku Jawa asli nusantara.
+        <footer className="text-center text-editorial-accent/60 text-[10px] font-mono pt-12 pb-6 border-t border-editorial-border/60 space-y-1 max-w-xl mx-auto">
+          <p className="font-semibold text-editorial-accent/85">
+            Berakar pada Kecerdasan Leluhur Jawa Nusantara.
           </p>
-          <p className="text-[10px] text-editorial-accent/70">
-            Kecerdasan Buatan menggunakan model Gemini-3.5-Flash berkecepatan tinggi.
+          <p className="text-[9px] text-editorial-accent/50">
+            Disempurnakan dengan bantuan Kecerdasan Buatan Gemini 3.5 Flash dan ChatGPT GPT-5.5 Thinking.
           </p>
         </footer>
       </main>
