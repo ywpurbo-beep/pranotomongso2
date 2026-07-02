@@ -27,7 +27,7 @@ export interface Mangsa {
 
 export interface Observation {
   id: string;
-  category: 'angin' | 'awan' | 'hewan' | 'tanaman';
+  category: 'angin' | 'awan' | 'hewan' | 'tanaman' | 'air';
   title: string;
   description: string;
   date: string;

@@ -245,7 +245,7 @@ export default function App() {
   };
 
   // Helper to filter observations for the rapid visual tiles
-  const getLatestObservationForCategory = (cat: 'angin' | 'awan' | 'hewan' | 'tanaman') => {
+  const getLatestObservationForCategory = (cat: 'angin' | 'awan' | 'hewan' | 'tanaman' | 'air') => {
     return observations.find(o => o.category === cat);
   };
 
@@ -255,6 +255,7 @@ export default function App() {
       case 'awan': return 'blue';
       case 'hewan': return 'amber';
       case 'tanaman': return 'emerald';
+      case 'air': return 'cyan';
       default: return 'slate';
     }
   };
@@ -265,6 +266,7 @@ export default function App() {
       case 'awan': return <Cloud className="w-5 h-5" />;
       case 'hewan': return <Bird className="w-5 h-5" />;
       case 'tanaman': return <Leaf className="w-5 h-5" />;
+      case 'air': return <Droplets className="w-5 h-5" />;
       default: return <Compass className="w-5 h-5" />;
     }
   };
@@ -509,9 +511,9 @@ export default function App() {
             </div>
           </div>
 
-          {/* 4 Primary Category Summary Tiles */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {(['angin', 'awan', 'hewan', 'tanaman'] as const).map((cat) => {
+          {/* 5 Primary Category Summary Tiles */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+            {(['angin', 'awan', 'hewan', 'tanaman', 'air'] as const).map((cat) => {
               const latest = getLatestObservationForCategory(cat);
               return (
                 <div 

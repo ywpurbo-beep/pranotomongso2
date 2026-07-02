@@ -335,5 +335,13 @@ export const INITIAL_OBSERVATIONS = [
     description: "Daun pohon jati dan dadap di pinggir ladang mulai berguguran kuning kering sempurna.",
     date: "28 Juni 2026",
     time: "07:30 WIB"
+  },
+  {
+    id: "obs_5",
+    category: "air" as const,
+    title: "Kondisi Sumber Air",
+    description: "Permukaan air sumur bor mulai mengalami penurunan sekitar 1.5 meter akibat intensitas hujan berkurang.",
+    date: "1 Juli 2026",
+    time: "11:20 WIB"
   }
 ];
