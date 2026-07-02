@@ -15,8 +15,10 @@ import {
   BookOpen, 
   ChevronRight, 
   ArrowRight,
-  RefreshCw
+  RefreshCw,
+  X
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Mangsa, Observation, AiAnalysisResult } from './types';
 import { MANGSAS_DATA, INITIAL_OBSERVATIONS } from './data';
 import HeaderSection from './components/HeaderSection';
@@ -40,6 +42,7 @@ export default function App() {
   const [observations, setObservations] = useState<Observation[]>([]);
   const [scrollY, setScrollY] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   
   // Realtime Weather State
   const [realtimeWeather, setRealtimeWeather] = useState<RealtimeWeather | null>(null);
@@ -269,7 +272,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-editorial-bg text-editorial-text font-sans selection:bg-editorial-accent/30 selection:text-editorial-text">
       {/* 1. Scrolling collapsing header */}
-      <HeaderSection activeMangsa={activeMangsa} scrollY={scrollY} />
+      <HeaderSection activeMangsa={activeMangsa} scrollY={scrollY} onInfoClick={() => setIsInfoOpen(true)} />
 
       {/* 2. Main Content Stage */}
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-8 space-y-8">
@@ -642,11 +645,11 @@ export default function App() {
                   )}
 
                   {/* Seasonal thumb image */}
-                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-editorial-border relative">
+                  <div className="w-20 h-20 aspect-square rounded-xl overflow-hidden flex-shrink-0 border border-editorial-border relative">
                     <img 
                       src={mangsa.imageUrl} 
                       alt={mangsa.name} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform mix-blend-multiply brightness-[0.98]"
+                      className="w-full h-full aspect-square object-cover group-hover:scale-105 transition-transform mix-blend-multiply brightness-[0.98]"
                       referrerPolicy="no-referrer"
                     />
                     <div className="absolute inset-0 bg-black/5" />
@@ -685,9 +688,12 @@ export default function App() {
         </section>
 
         {/* Footer info banner */}
-        <footer className="text-center text-editorial-accent/60 text-[10px] font-mono pt-12 pb-6 border-t border-editorial-border/60 space-y-1.5 max-w-xl mx-auto leading-relaxed">
+        <footer className="text-center text-editorial-accent/60 text-[10px] font-mono pt-12 pb-6 border-t border-editorial-border/60 space-y-2 max-w-xl mx-auto leading-relaxed">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-editorial-card border border-editorial-border font-bold text-[10px] text-editorial-text tracking-widest uppercase mb-1 shadow-sm">
+            AI + AI
+          </div>
           <p className="font-semibold text-editorial-accent/85">
-            Dirancang berdasarkan kecerdasan leluhur yang diwariskan melalui kearifan Pranata Mangsa Nusantara.
+            Dirancang berdasarkan Ancestral Intelligence yang diwariskan melalui kearifan Pranata Mangsa Nusantara.
           </p>
           <p className="text-[9px] text-editorial-accent/50">
             Dikembangkan dengan bantuan Artificial Intelligence menggunakan Google Gemini 3.5 Flash dan OpenAI ChatGPT GPT-5.5.
@@ -701,6 +707,106 @@ export default function App() {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveObservation}
       />
+
+      {/* 4. Global Modal for Pranata Mangsa Information & Philosophy */}
+      <AnimatePresence>
+        {isInfoOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsInfoOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+
+            {/* Modal Body */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-editorial-bg border border-editorial-border rounded-2xl p-6 md:p-8 shadow-2xl z-10 space-y-6"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setIsInfoOpen(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-editorial-border/30 text-editorial-accent hover:text-editorial-text transition-colors"
+                title="Tutup Dialog"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Title Header */}
+              <div className="space-y-2 text-center border-b border-editorial-border/80 pb-4">
+                <div className="inline-flex p-3 rounded-full bg-editorial-accent/10 text-editorial-accent border border-editorial-border/50 mx-auto">
+                  <Compass className="w-6 h-6 text-editorial-accent" />
+                </div>
+                <h3 className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-editorial-text">
+                  Kearifan Pranata Mangsa Jawa
+                </h3>
+                <p className="text-xs font-mono font-bold text-editorial-accent uppercase tracking-widest">
+                  Ancestral Intelligence • Pranoto Mongso
+                </p>
+              </div>
+
+              {/* Content Grid */}
+              <div className="space-y-5 text-sm text-editorial-text leading-relaxed font-sans font-light">
+                <div className="space-y-2">
+                  <h4 className="font-serif font-bold text-base text-editorial-text flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-editorial-accent rounded-full" />
+                    Apa itu Pranata Mangsa?
+                  </h4>
+                  <p className="pl-3.5">
+                    <strong>Pranata Mangsa</strong> (artinya: ketentuan musim) adalah sistem kalender pertanian tradisional Jawa kuno berbasis penanggalan matahari (Solar/Surya). Diwariskan turun-temurun, kalender ini membagi satu tahun penuh menjadi 12 siklus <em>(Mangsa)</em> dengan durasi tidak seragam, mencerminkan pergeseran rasi bintang, iklim mikro, dan tanda-tanda alam di pulau Jawa.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-serif font-bold text-base text-editorial-text flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-editorial-accent rounded-full" />
+                    Filosofi Pemanfaatan Aplikasi
+                  </h4>
+                  <p className="pl-3.5">
+                    Aplikasi ini dirancang sebagai jembatan interaktif antara <strong>Ancestral Intelligence</strong> (kecerdasan leluhur nusantara) dengan <strong>Artificial Intelligence</strong> (kecerdasan buatan modern). Kami percaya bahwa teknologi masa depan yang terbaik dikembangkan tanpa melupakan kearifan masa lalu yang mengajarkan kehidupan yang selaras dengan bumi <em>(Hamemayu Hayuning Bawana)</em>.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-serif font-bold text-base text-editorial-text flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-editorial-accent rounded-full" />
+                    Manfaat & Guna Aplikasi
+                  </h4>
+                  <ul className="pl-3.5 space-y-2.5 list-none">
+                    <li className="flex gap-2 items-start">
+                      <span className="font-serif font-bold text-editorial-accent">1.</span>
+                      <span><strong>Menyelaraskan Penanggalan</strong>: Gunakan penyeleksi tanggal dinamis untuk memetakan penanggalan masehi hari ini, hari esok, atau masa lampau ke siklus 12 mangsa secara otomatis.</span>
+                    </li>
+                    <li className="flex gap-2 items-start">
+                      <span className="font-serif font-bold text-editorial-accent">2.</span>
+                      <span><strong>Mencatat Sasmita Alam</strong>: Jurnal "Observasi Cepat" Anda mencakup tanda-tanda biologi (hewan dan tanaman) serta tanda abiotik (arah angin, tipe awan) di sekitar pekarangan atau lahan Anda.</span>
+                    </li>
+                    <li className="flex gap-2 items-start">
+                      <span className="font-serif font-bold text-editorial-accent">3.</span>
+                      <span><strong>Prakiraan & Analisis AI</strong>: Kecerdasan Buatan (Google Gemini & OpenAI ChatGPT) menganalisis keselarasan jurnal observasi lokal Anda dengan siklus tradisional mangsa aktif guna memberi masukan agraris presisi.</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Action Close */}
+              <div className="pt-4 border-t border-editorial-border/60 text-center">
+                <button
+                  onClick={() => setIsInfoOpen(false)}
+                  className="px-6 py-2.5 bg-editorial-text hover:bg-editorial-accent text-white font-mono text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm cursor-pointer"
+                >
+                  Saya Mengerti & Siap Mengamati
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,14 +1,15 @@
 import { Mangsa } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
-import { Leaf, Compass } from 'lucide-react';
+import { Leaf, Compass, Info } from 'lucide-react';
 
 interface HeaderSectionProps {
   activeMangsa: Mangsa;
   scrollY: number;
   onExploreClick?: () => void;
+  onInfoClick: () => void;
 }
 
-export default function HeaderSection({ activeMangsa, scrollY, onExploreClick }: HeaderSectionProps) {
+export default function HeaderSection({ activeMangsa, scrollY, onExploreClick, onInfoClick }: HeaderSectionProps) {
   // Calculate collapse levels based on scrollY
   const maxScroll = 200;
   const rawRatio = Math.min(scrollY / maxScroll, 1);
@@ -81,9 +82,19 @@ export default function HeaderSection({ activeMangsa, scrollY, onExploreClick }:
             </div>
           </div>
           
-          <div className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-editorial-text bg-editorial-bg px-3 py-1 rounded-full border border-editorial-border">
-            <Leaf className="w-3.5 h-3.5 text-editorial-accent" />
-            <span className="font-serif italic">{activeMangsa.dates}</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onInfoClick}
+              className="flex items-center gap-1 text-[10px] font-mono font-bold tracking-widest uppercase text-editorial-accent bg-white/90 px-3 py-1.5 rounded-full border border-editorial-border hover:bg-editorial-accent hover:text-white transition-all cursor-pointer pointer-events-auto"
+              title="Filosofi & Guna"
+            >
+              <Info className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Filosofi</span>
+            </button>
+            <div className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-editorial-text bg-editorial-bg px-3 py-1.5 rounded-full border border-editorial-border">
+              <Leaf className="w-3.5 h-3.5 text-editorial-accent" />
+              <span className="font-serif italic">{activeMangsa.dates}</span>
+            </div>
           </div>
         </motion.div>
       )}
@@ -98,10 +109,21 @@ export default function HeaderSection({ activeMangsa, scrollY, onExploreClick }:
         }}
       >
         <div className="max-w-4xl mx-auto w-full">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-editorial-card/90 text-editorial-text border border-editorial-border text-[10px] font-mono tracking-widest uppercase shadow-sm">
-            <Compass className="w-3.5 h-3.5 text-editorial-accent" />
-            <span>Kawuruh Alam • Pranoto Mongso</span>
+          {/* Badge line with Info Trigger */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-editorial-card/90 text-editorial-text border border-editorial-border text-[10px] font-mono tracking-widest uppercase shadow-sm">
+              <Compass className="w-3.5 h-3.5 text-editorial-accent" />
+              <span>Kawuruh Alam • Pranoto Mongso</span>
+            </div>
+
+            <button
+              onClick={onInfoClick}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white hover:bg-editorial-text hover:text-white transition-all text-editorial-accent border border-editorial-border text-[10px] font-mono tracking-widest uppercase shadow-sm pointer-events-auto cursor-pointer"
+              title="Filosofi & Guna"
+            >
+              <Info className="w-3 h-3 text-editorial-accent hover:text-inherit" />
+              <span>Filosofi & Guna</span>
+            </button>
           </div>
 
           {/* Core Title */}
