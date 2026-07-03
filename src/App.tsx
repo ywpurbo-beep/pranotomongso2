@@ -26,8 +26,8 @@ import HeaderSection from './components/HeaderSection';
 import AddObservationModal from './components/AddObservationModal';
 import AiAnalysisView from './components/AiAnalysisView';
 import { getMangsaForDate, getStartDateForMangsa, formatDateToYYYYMMDD } from './utils/dateUtils';
-import splashBg from './assets/images/splash_background_v2_1783091628955.jpg';
-import gununganCrest from './assets/images/gold_logo_crest_1783091645087.jpg';
+import splashBg from './assets/images/splash_background_v3_1783093080554.jpg';
+import gununganCrest from './assets/images/gold_transparent_logo_v2_1783093581810.jpg';
 
 interface RealtimeWeather {
   temp: string;
