@@ -70,6 +70,17 @@ export default function App() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
+  // Automatically transition splash screen after a short period (2.5 seconds)
+  useEffect(() => {
+    if (showSplash) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+        sessionStorage.setItem('pranoto_mongso_seen_splash', 'true');
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showSplash]);
+
   // 2. Load Local Storage
   useEffect(() => {
     const savedObs = localStorage.getItem('pranoto_mongso_observations');
@@ -356,41 +367,52 @@ export default function App() {
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-between p-6 overflow-hidden bg-[#12100e]"
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            onClick={() => {
+              setShowSplash(false);
+              sessionStorage.setItem('pranoto_mongso_seen_splash', 'true');
+            }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-between p-8 overflow-hidden bg-[#1a1612] cursor-pointer select-none"
+            title="Sentuh untuk masuk ke aplikasi"
           >
-            {/* Background Image with Vignette and Overlay */}
-            <div className="absolute inset-0 w-full h-full">
+            {/* Background Image with Vignette and Overlay to match poster exactly */}
+            <div className="absolute inset-0 w-full h-full pointer-events-none">
               <img
                 src={splashBg}
                 alt="Pranoto Mongso Landscape"
-                className="w-full h-full object-cover brightness-[0.8] scale-105"
+                className="w-full h-full object-cover brightness-[0.75] contrast-[1.05] scale-100"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-[#12100e]/40 to-black/90" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#12100e_90%)]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-[#1a1612]/30 to-black/85" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_25%,#1a1612_95%)]" />
             </div>
 
             {/* Top Header Text */}
-            <div className="w-full text-center pt-8 z-10 opacity-60">
-              <span className="text-[9px] font-mono tracking-[0.3em] text-[#EAD8C0] uppercase font-bold">
+            <div className="w-full text-center pt-6 z-10 opacity-70 pointer-events-none">
+              <span className="text-[10px] md:text-xs font-mono tracking-[0.35em] text-[#EAD8C0] uppercase font-bold">
                 KAWURUH PRANATA MANGSA
               </span>
             </div>
 
-            {/* Central content card */}
-            <div className="flex flex-col items-center text-center max-w-xl px-4 z-10 my-auto">
-              {/* Golden Gunungan Crest */}
+            {/* Central content card - styled identically to poster */}
+            <div className="flex flex-col items-center text-center max-w-xl px-4 z-10 my-auto pointer-events-none">
+              {/* Golden Gunungan Crest - Utuh, Tanpa frame/lingkaran hitam/border */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.85, y: 15 }}
+                initial={{ opacity: 0, scale: 0.9, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 1.2, ease: "easeOut" }}
-                className="w-36 h-36 md:w-48 md:h-48 rounded-full overflow-hidden border border-[#EAD8C0]/35 shadow-[0_0_60px_rgba(234,216,192,0.2)] flex items-center justify-center p-1 bg-black/40 backdrop-blur-md"
+                transition={{ delay: 0.1, duration: 1.2, ease: "easeOut" }}
+                className="relative w-44 h-44 md:w-56 md:h-56 flex items-center justify-center mb-6"
               >
+                {/* Gold Halo Light behind logo */}
+                <div className="absolute w-40 h-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(234,216,192,0.35)_0%,transparent_75%)] blur-2xl animate-pulse" />
                 <img
                   src={gununganCrest}
                   alt="Golden Gunungan Crest"
-                  className="w-full h-full object-cover rounded-full"
+                  className="w-full h-full object-contain"
+                  style={{ 
+                    filter: "drop-shadow(0 0 35px rgba(234, 216, 192, 0.6)) drop-shadow(0 0 70px rgba(234, 216, 192, 0.25))", 
+                    mixBlendMode: "screen" 
+                  }}
                   referrerPolicy="no-referrer"
                 />
               </motion.div>
@@ -399,51 +421,48 @@ export default function App() {
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 1 }}
-                className="mt-8 space-y-4"
+                transition={{ delay: 0.4, duration: 1.0 }}
+                className="space-y-4"
               >
-                <h1 className="font-serif text-3xl md:text-5xl font-extrabold text-[#EAD8C0] tracking-[0.25em] leading-none uppercase">
-                  Pranoto Mongso
+                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-light text-[#EAD8C0] tracking-[0.25em] leading-tight uppercase font-medium">
+                  PRANOTO
+                  <span className="block mt-1">MONGSO</span>
                 </h1>
                 
-                {/* Custom Elegant Divider */}
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-[#EAD8C0]/40" />
-                  <span className="text-[#EAD8C0]/60 text-xs">❖</span>
-                  <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-[#EAD8C0]/40" />
+                {/* Custom Elegant Divider matching the poster line */}
+                <div className="flex items-center justify-center gap-4 py-2">
+                  <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#EAD8C0]/35 to-transparent" />
+                  <span className="text-[#EAD8C0]/60 text-[10px] tracking-widest">❖</span>
+                  <div className="w-16 h-[1px] bg-gradient-to-l from-transparent via-[#EAD8C0]/35 to-transparent" />
                 </div>
 
-                <p className="font-serif text-sm md:text-lg text-[#D4C5B3]/95 italic leading-relaxed max-w-md mx-auto">
+                <p className="font-serif text-sm md:text-lg text-[#D4C5B3]/90 italic leading-relaxed max-w-md mx-auto">
                   Membaca Ritme Alam, Menjaga Harmoni Kehidupan
                 </p>
               </motion.div>
-
-              {/* Start Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.8 }}
-                className="mt-8"
-              >
-                <button
-                  id="dismiss-splash-btn"
-                  onClick={() => {
-                    setShowSplash(false);
-                    sessionStorage.setItem('pranoto_mongso_seen_splash', 'true');
-                  }}
-                  className="px-8 py-3.5 bg-[#EAD8C0] hover:bg-[#F5E8D6] text-black rounded-full font-mono text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-[0_4px_20px_rgba(234,216,192,0.25)] hover:shadow-[0_4px_30px_rgba(234,216,192,0.45)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 group"
-                >
-                  Mulai Jelajah
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </motion.div>
             </div>
 
-            {/* Bottom Footer */}
-            <div className="w-full text-center pb-4 z-10">
-              <p className="text-[9px] md:text-[10px] text-[#A49685]/80 tracking-[0.2em] uppercase font-bold">
-                Pranata Mangsa • Warisan Kearifan Nusantara
-              </p>
+            {/* Bottom Footer & Minimal Skip Hint */}
+            <div className="w-full text-center pb-4 z-10 space-y-4 flex flex-col items-center pointer-events-none">
+              {/* Subtle gold floral mandala decoration */}
+              <div className="text-[#EAD8C0]/40 text-sm animate-pulse">✥</div>
+              
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-xs font-serif text-[#EAD8C0]/60 italic tracking-wider">Pranata Mangsa</span>
+                <p className="text-[8px] md:text-[9px] text-[#A49685]/80 tracking-[0.25em] uppercase font-bold font-mono">
+                  WARISAN KEARIFAN NUSANTARA
+                </p>
+              </div>
+
+              {/* Seamless Tap Anywhere hint */}
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.3, 0.7, 0.3] }}
+                transition={{ repeat: Infinity, duration: 3, delay: 1 }}
+                className="text-[9px] text-[#EAD8C0]/45 font-sans tracking-wide italic font-light pt-2"
+              >
+                Sentuh layar di mana saja untuk melewati
+              </motion.span>
             </div>
           </motion.div>
         )}
