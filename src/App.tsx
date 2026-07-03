@@ -372,7 +372,7 @@ export default function App() {
               setShowSplash(false);
               sessionStorage.setItem('pranoto_mongso_seen_splash', 'true');
             }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-between p-8 overflow-hidden bg-[#1a1612] cursor-pointer select-none"
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-between p-8 overflow-hidden bg-[#E5D5BC] cursor-pointer select-none"
             title="Sentuh untuk masuk ke aplikasi"
           >
             {/* Background Image with Vignette and Overlay to match poster exactly */}
@@ -380,16 +380,16 @@ export default function App() {
               <img
                 src={splashBg}
                 alt="Pranoto Mongso Landscape"
-                className="w-full h-full object-cover brightness-[0.75] contrast-[1.05] scale-100"
+                className="w-full h-full object-cover brightness-100 contrast-100 scale-100"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-[#1a1612]/30 to-black/85" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_25%,#1a1612_95%)]" />
+              {/* Very subtle, light warm gold vignette to match poster borders gently without darkening */}
+              <div className="absolute inset-0 bg-gradient-to-b from-[#7c6a54]/10 via-transparent to-[#7c6a54]/15" />
             </div>
 
             {/* Top Header Text */}
-            <div className="w-full text-center pt-6 z-10 opacity-70 pointer-events-none">
-              <span className="text-[10px] md:text-xs font-mono tracking-[0.35em] text-[#EAD8C0] uppercase font-bold">
+            <div className="w-full text-center pt-6 z-10 opacity-80 pointer-events-none">
+              <span className="text-[10px] md:text-xs font-mono tracking-[0.4em] text-[#4c3b28] uppercase font-bold">
                 KAWURUH PRANATA MANGSA
               </span>
             </div>
@@ -401,16 +401,16 @@ export default function App() {
                 initial={{ opacity: 0, scale: 0.9, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 1.2, ease: "easeOut" }}
-                className="relative w-44 h-44 md:w-56 md:h-56 flex items-center justify-center mb-6"
+                className="relative w-44 h-44 md:w-56 md:h-56 flex items-center justify-center mb-4"
               >
-                {/* Gold Halo Light behind logo */}
-                <div className="absolute w-40 h-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(234,216,192,0.35)_0%,transparent_75%)] blur-2xl animate-pulse" />
+                {/* Volumetric Warm Halo Light behind logo to match poster exactly */}
+                <div className="absolute w-48 h-48 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,248,235,0.7)_0%,transparent_70%)] blur-2xl animate-pulse" />
                 <img
                   src={gununganCrest}
                   alt="Golden Gunungan Crest"
                   className="w-full h-full object-contain"
                   style={{ 
-                    filter: "drop-shadow(0 0 35px rgba(234, 216, 192, 0.6)) drop-shadow(0 0 70px rgba(234, 216, 192, 0.25))", 
+                    filter: "drop-shadow(0 0 25px rgba(255, 235, 200, 0.45))", 
                     mixBlendMode: "screen" 
                   }}
                   referrerPolicy="no-referrer"
@@ -424,20 +424,21 @@ export default function App() {
                 transition={{ delay: 0.4, duration: 1.0 }}
                 className="space-y-4"
               >
-                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-light text-[#EAD8C0] tracking-[0.25em] leading-tight uppercase font-medium">
+                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-normal text-[#4c3b28] tracking-[0.22em] leading-[1.2] uppercase">
                   PRANOTO
-                  <span className="block mt-1">MONGSO</span>
+                  <span className="block mt-1 tracking-[0.2em]">MONGSO</span>
                 </h1>
                 
                 {/* Custom Elegant Divider matching the poster line */}
                 <div className="flex items-center justify-center gap-4 py-2">
-                  <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#EAD8C0]/35 to-transparent" />
-                  <span className="text-[#EAD8C0]/60 text-[10px] tracking-widest">❖</span>
-                  <div className="w-16 h-[1px] bg-gradient-to-l from-transparent via-[#EAD8C0]/35 to-transparent" />
+                  <div className="w-16 h-[0.5px] bg-[#4c3b28]/35" />
+                  <span className="text-[#4c3b28]/60 text-[10px] tracking-widest">❖</span>
+                  <div className="w-16 h-[0.5px] bg-[#4c3b28]/35" />
                 </div>
 
-                <p className="font-serif text-sm md:text-lg text-[#D4C5B3]/90 italic leading-relaxed max-w-md mx-auto">
-                  Membaca Ritme Alam, Menjaga Harmoni Kehidupan
+                <p className="font-serif text-sm md:text-lg text-[#5a4734] italic leading-relaxed max-w-md mx-auto">
+                  Membaca Ritme Alam,
+                  <span className="block mt-1">Menjaga Harmoni Kehidupan</span>
                 </p>
               </motion.div>
             </div>
@@ -445,11 +446,11 @@ export default function App() {
             {/* Bottom Footer & Minimal Skip Hint */}
             <div className="w-full text-center pb-4 z-10 space-y-4 flex flex-col items-center pointer-events-none">
               {/* Subtle gold floral mandala decoration */}
-              <div className="text-[#EAD8C0]/40 text-sm animate-pulse">✥</div>
+              <div className="text-[#4c3b28]/50 text-sm">✥</div>
               
               <div className="flex flex-col items-center gap-1">
-                <span className="text-xs font-serif text-[#EAD8C0]/60 italic tracking-wider">Pranata Mangsa</span>
-                <p className="text-[8px] md:text-[9px] text-[#A49685]/80 tracking-[0.25em] uppercase font-bold font-mono">
+                <span className="text-sm font-serif text-[#4c3b28]/80 italic tracking-wider">Pranata Mangsa</span>
+                <p className="text-[8px] md:text-[9px] text-[#5a4734]/70 tracking-[0.25em] uppercase font-bold font-mono">
                   WARISAN KEARIFAN NUSANTARA
                 </p>
               </div>
@@ -457,9 +458,9 @@ export default function App() {
               {/* Seamless Tap Anywhere hint */}
               <motion.span 
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0.3, 0.7, 0.3] }}
+                animate={{ opacity: [0.4, 0.8, 0.4] }}
                 transition={{ repeat: Infinity, duration: 3, delay: 1 }}
-                className="text-[9px] text-[#EAD8C0]/45 font-sans tracking-wide italic font-light pt-2"
+                className="text-[9px] text-[#4c3b28]/60 font-sans tracking-wide italic font-light pt-2"
               >
                 Sentuh layar di mana saja untuk melewati
               </motion.span>
