@@ -26,6 +26,8 @@ import HeaderSection from './components/HeaderSection';
 import AddObservationModal from './components/AddObservationModal';
 import AiAnalysisView from './components/AiAnalysisView';
 import { getMangsaForDate, getStartDateForMangsa, formatDateToYYYYMMDD } from './utils/dateUtils';
+import splashBg from './assets/images/splash_background_1783082851478.jpg';
+import gununganCrest from './assets/images/gold_gunungan_crest_1783082871234.jpg';
 
 interface RealtimeWeather {
   temp: string;
@@ -34,6 +36,16 @@ interface RealtimeWeather {
   rainfall: string;
   skyCondition: string;
   locationName: string;
+  latitude?: number;
+  longitude?: number;
+  pressure?: string;
+  hourlyForecast24h?: Array<{
+    time: string;
+    temp: string;
+    humidity: string;
+    precipitation: string;
+    condition: string;
+  }>;
 }
 
 export default function App() {
@@ -44,6 +56,10 @@ export default function App() {
   const [scrollY, setScrollY] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState(() => {
+    const hasSeen = sessionStorage.getItem('pranoto_mongso_seen_splash');
+    return hasSeen !== 'true';
+  });
   
   // Realtime Weather State
   const [realtimeWeather, setRealtimeWeather] = useState<RealtimeWeather | null>(null);
@@ -87,7 +103,7 @@ export default function App() {
       async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-          const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,rain,weather_code,wind_speed_10m,wind_direction_10m`;
+          const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,rain,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl&hourly=temperature_2m,relative_humidity_2m,precipitation,weather_code&forecast_days=2`;
           const weatherRes = await fetch(weatherUrl);
           if (!weatherRes.ok) throw new Error();
           const weatherData = await weatherRes.json();
@@ -136,13 +152,37 @@ export default function App() {
             // ignore nominatim failure, fallback works fine
           }
 
+          // Parse hourly forecast for next 24 hours
+          const hourly = weatherData.hourly;
+          const hourlyForecast24h = [];
+          if (hourly && hourly.time) {
+            for (let i = 0; i < 24; i++) {
+              if (hourly.time[i]) {
+                const hourStr = new Date(hourly.time[i]).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+                hourlyForecast24h.push({
+                  time: hourStr,
+                  temp: `${Math.round(hourly.temperature_2m[i])}°C`,
+                  humidity: `${hourly.relative_humidity_2m[i]}%`,
+                  precipitation: `${hourly.precipitation[i]} mm`,
+                  condition: getSkyConditionIndonesian(hourly.weather_code[i])
+                });
+              }
+            }
+          }
+
+          const pressureStr = cur.pressure_msl ? `${Math.round(cur.pressure_msl)} hPa` : "Tidak tersedia";
+
           setRealtimeWeather({
             temp: `${Math.round(cur.temperature_2m)}°C`,
             wind: `${Math.round(cur.wind_speed_10m)} km/j ${getWindDirectionIndonesian(cur.wind_direction_10m)}`,
             humidity: `${cur.relative_humidity_2m}%`,
             rainfall: `${cur.rain} mm`,
             skyCondition: getSkyConditionIndonesian(cur.weather_code),
-            locationName
+            locationName,
+            latitude,
+            longitude,
+            pressure: pressureStr,
+            hourlyForecast24h
           });
         } catch (err) {
           console.error("Gagal memperbarui cuaca realtime", err);
@@ -218,6 +258,14 @@ export default function App() {
     setAiLoading(true);
     setAiError(null);
     try {
+      const sanitizedMangsas = MANGSAS_DATA.map(({ imageUrl, ...m }) => m);
+      const formattedDate = selectedDate.toLocaleDateString('id-ID', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
       const response = await fetch('/api/analyze-observations', {
         method: 'POST',
         headers: {
@@ -225,7 +273,27 @@ export default function App() {
         },
         body: JSON.stringify({
           observations,
-          currentMangsa: activeMangsa
+          latestObservation: observations[0] || null,
+          observationsHistory: observations.slice(1),
+          currentMangsa: activeMangsa,
+          allMangsas: sanitizedMangsas,
+          selectedDate: formattedDate,
+          location: {
+            name: realtimeWeather?.locationName || "Tidak terdeteksi (Fallback Sleman, Yogyakarta)",
+            coords: realtimeWeather?.latitude && realtimeWeather?.longitude ? {
+              latitude: realtimeWeather.latitude,
+              longitude: realtimeWeather.longitude
+            } : null
+          },
+          realtimeWeather: realtimeWeather ? {
+            temp: realtimeWeather.temp,
+            humidity: realtimeWeather.humidity,
+            rainfall: realtimeWeather.rainfall,
+            wind: realtimeWeather.wind,
+            pressure: realtimeWeather.pressure || "Tidak tersedia",
+            skyCondition: realtimeWeather.skyCondition,
+            hourlyForecast24h: realtimeWeather.hourlyForecast24h || []
+          } : null
         })
       });
 
@@ -282,6 +350,105 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-editorial-bg text-editorial-text font-sans selection:bg-editorial-accent/30 selection:text-editorial-text">
+      {/* Dynamic Immersive Splash Screen */}
+      <AnimatePresence>
+        {showSplash && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-between p-6 overflow-hidden bg-[#12100e]"
+          >
+            {/* Background Image with Vignette and Overlay */}
+            <div className="absolute inset-0 w-full h-full">
+              <img
+                src={splashBg}
+                alt="Pranoto Mongso Landscape"
+                className="w-full h-full object-cover brightness-[0.8] scale-105"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-[#12100e]/40 to-black/90" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#12100e_90%)]" />
+            </div>
+
+            {/* Top Header Text */}
+            <div className="w-full text-center pt-8 z-10 opacity-60">
+              <span className="text-[9px] font-mono tracking-[0.3em] text-[#EAD8C0] uppercase font-bold">
+                KAWURUH PRANATA MANGSA
+              </span>
+            </div>
+
+            {/* Central content card */}
+            <div className="flex flex-col items-center text-center max-w-xl px-4 z-10 my-auto">
+              {/* Golden Gunungan Crest */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 1.2, ease: "easeOut" }}
+                className="w-36 h-36 md:w-48 md:h-48 rounded-full overflow-hidden border border-[#EAD8C0]/35 shadow-[0_0_60px_rgba(234,216,192,0.2)] flex items-center justify-center p-1 bg-black/40 backdrop-blur-md"
+              >
+                <img
+                  src={gununganCrest}
+                  alt="Golden Gunungan Crest"
+                  className="w-full h-full object-cover rounded-full"
+                  referrerPolicy="no-referrer"
+                />
+              </motion.div>
+
+              {/* Title & Subtitle */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 1 }}
+                className="mt-8 space-y-4"
+              >
+                <h1 className="font-serif text-3xl md:text-5xl font-extrabold text-[#EAD8C0] tracking-[0.25em] leading-none uppercase">
+                  Pranoto Mongso
+                </h1>
+                
+                {/* Custom Elegant Divider */}
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-[#EAD8C0]/40" />
+                  <span className="text-[#EAD8C0]/60 text-xs">❖</span>
+                  <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-[#EAD8C0]/40" />
+                </div>
+
+                <p className="font-serif text-sm md:text-lg text-[#D4C5B3]/95 italic leading-relaxed max-w-md mx-auto">
+                  Membaca Ritme Alam, Menjaga Harmoni Kehidupan
+                </p>
+              </motion.div>
+
+              {/* Start Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.8 }}
+                className="mt-8"
+              >
+                <button
+                  id="dismiss-splash-btn"
+                  onClick={() => {
+                    setShowSplash(false);
+                    sessionStorage.setItem('pranoto_mongso_seen_splash', 'true');
+                  }}
+                  className="px-8 py-3.5 bg-[#EAD8C0] hover:bg-[#F5E8D6] text-black rounded-full font-mono text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-[0_4px_20px_rgba(234,216,192,0.25)] hover:shadow-[0_4px_30px_rgba(234,216,192,0.45)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 group"
+                >
+                  Mulai Jelajah
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </motion.div>
+            </div>
+
+            {/* Bottom Footer */}
+            <div className="w-full text-center pb-4 z-10">
+              <p className="text-[9px] md:text-[10px] text-[#A49685]/80 tracking-[0.2em] uppercase font-bold">
+                Pranata Mangsa • Warisan Kearifan Nusantara
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 1. Scrolling collapsing header */}
       <HeaderSection activeMangsa={activeMangsa} scrollY={scrollY} onInfoClick={() => setIsInfoOpen(true)} />
 

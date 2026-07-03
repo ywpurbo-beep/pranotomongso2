@@ -1,4 +1,18 @@
-import { Compass, MessageSquare, AlertCircle, Sparkles, Loader2, Leaf, Scroll } from 'lucide-react';
+import { 
+  Compass, 
+  MessageSquare, 
+  AlertCircle, 
+  Sparkles, 
+  Loader2, 
+  Leaf, 
+  Scroll,
+  Eye,
+  Activity,
+  CloudSun,
+  ShieldAlert,
+  Flame,
+  CheckCircle2
+} from 'lucide-react';
 import { AiAnalysisResult } from '../types';
 
 interface AiAnalysisViewProps {
@@ -120,39 +134,118 @@ export default function AiAnalysisView({
               </div>
             </div>
 
-            {/* Structured Text Blocks */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-editorial-border">
-              {/* Alignment Analysis */}
-              <div className="space-y-3">
-                <h4 className="flex items-center gap-1.5 text-xs font-mono font-bold text-editorial-accent uppercase tracking-widest">
-                  <Compass className="w-4 h-4 text-editorial-accent" />
-                  Kesesuaian Sasmita
+            {/* Integrated Nature Research & Contextual Synthesis Panels */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-editorial-border">
+              {/* Current Ecological Phenomena */}
+              <div className="p-5 rounded-xl bg-editorial-bg border border-editorial-border space-y-3">
+                <h4 className="flex items-center gap-2 text-xs font-mono font-bold text-editorial-accent uppercase tracking-widest">
+                  <Activity className="w-4 h-4 text-editorial-accent" />
+                  Kaji Fenomena Ekologi Terkini
                 </h4>
-                <p className="text-sm text-editorial-text leading-relaxed font-sans font-light">
-                  {analysis.alignmentAnalysis}
+                <p className="text-xs md:text-sm text-editorial-text leading-relaxed font-sans font-light">
+                  {analysis.phenomenaExplanation || "Sedang memetakan fenomena ekologi terkini..."}
                 </p>
               </div>
 
-              {/* Local Wisdom */}
+              {/* Scientific Traditional Connection */}
+              <div className="p-5 rounded-xl bg-editorial-bg border border-editorial-border space-y-3">
+                <h4 className="flex items-center gap-2 text-xs font-mono font-bold text-editorial-accent uppercase tracking-widest">
+                  <CloudSun className="w-4 h-4 text-editorial-accent" />
+                  Sintesis Sains & Pranoto Mongso
+                </h4>
+                <p className="text-xs md:text-sm text-editorial-text leading-relaxed font-sans font-light">
+                  {analysis.scientificTraditionalConnection || "Menyinkronkan data numerik klimatologi dengan sasmita tradisional..."}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-editorial-border">
+              {/* Forecast Phenomena */}
               <div className="space-y-3">
                 <h4 className="flex items-center gap-1.5 text-xs font-mono font-bold text-editorial-accent uppercase tracking-widest">
-                  <MessageSquare className="w-4 h-4 text-editorial-accent" />
-                  Makna Kearifan Lokal
+                  <Flame className="w-4 h-4 text-editorial-accent" />
+                  Prakiraan Isyarat Depan
                 </h4>
-                <p className="text-sm text-editorial-text leading-relaxed font-sans font-light">
-                  {analysis.localWisdom}
+                <p className="text-xs md:text-sm text-editorial-text leading-relaxed font-sans font-light">
+                  {analysis.forecastPhenomena || "Memperkirakan kecenderungan alam..."}
                 </p>
               </div>
 
-              {/* Agricultural Advice */}
+              {/* Recommended Action (Laku) */}
               <div className="space-y-3">
                 <h4 className="flex items-center gap-1.5 text-xs font-mono font-bold text-editorial-accent uppercase tracking-widest">
-                  <Leaf className="w-4 h-4 text-editorial-accent" />
-                  Saran Bercocok Tanam
+                  <CheckCircle2 className="w-4 h-4 text-editorial-accent" />
+                  Laku / Saran Tindakan
                 </h4>
-                <p className="text-sm text-editorial-text leading-relaxed font-sans font-light">
-                  {analysis.agriculturalAdvice}
+                <p className="text-xs md:text-sm text-editorial-text leading-relaxed font-sans font-light">
+                  {analysis.recommendedAction || "Menyusun laku harian yang selaras..."}
                 </p>
+              </div>
+
+              {/* Things to Observe (Verification checklist) */}
+              <div className="space-y-3">
+                <h4 className="flex items-center gap-1.5 text-xs font-mono font-bold text-editorial-accent uppercase tracking-widest">
+                  <Eye className="w-4 h-4 text-editorial-accent" />
+                  Verifikasi Pengamatan Anda
+                </h4>
+                {analysis.thingsToObserve && analysis.thingsToObserve.length > 0 ? (
+                  <ul className="space-y-2">
+                    {analysis.thingsToObserve.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-xs text-editorial-text font-sans font-light leading-relaxed">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-editorial-accent shrink-0 animate-ping" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-editorial-accent shrink-0 -ml-1.5 mt-1.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-editorial-accent font-serif italic">Belum ada indikator spesifik yang harus diverifikasi.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Risk Warnings Box */}
+            {analysis.riskWarning && (
+              <div className={`p-4 rounded-xl border flex gap-3 items-start ${
+                analysis.riskWarning.toLowerCase().includes('aman') || analysis.riskWarning.toLowerCase().includes('stabil')
+                  ? 'bg-emerald-50/50 border-emerald-100 text-emerald-800'
+                  : 'bg-amber-50/50 border-amber-100 text-amber-900'
+              }`}>
+                <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider block">Peringatan Risiko Lingkungan</span>
+                  <p className="text-xs font-light leading-relaxed">
+                    {analysis.riskWarning}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Original Core Analysis Sections (Kesesuaian, Makna, Saran Pertanian) inside an elegant border section */}
+            <div className="pt-6 border-t border-editorial-border space-y-4">
+              <span className="text-[9px] font-mono tracking-[0.2em] text-editorial-accent font-bold uppercase block">Analisis Inti Pranoto Mongso</span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <h5 className="text-xs font-sans font-semibold text-editorial-text flex items-center gap-1">
+                    <Compass className="w-3.5 h-3.5 text-editorial-accent" />
+                    1. Kesesuaian Sasmita
+                  </h5>
+                  <p className="text-xs text-editorial-accent leading-relaxed font-light">{analysis.alignmentAnalysis}</p>
+                </div>
+                <div className="space-y-2">
+                  <h5 className="text-xs font-sans font-semibold text-editorial-text flex items-center gap-1">
+                    <MessageSquare className="w-3.5 h-3.5 text-editorial-accent" />
+                    2. Makna Kearifan Lokal
+                  </h5>
+                  <p className="text-xs text-editorial-accent leading-relaxed font-light">{analysis.localWisdom}</p>
+                </div>
+                <div className="space-y-2">
+                  <h5 className="text-xs font-sans font-semibold text-editorial-text flex items-center gap-1">
+                    <Leaf className="w-3.5 h-3.5 text-editorial-accent" />
+                    3. Saran Bercocok Tanam
+                  </h5>
+                  <p className="text-xs text-editorial-accent leading-relaxed font-light">{analysis.agriculturalAdvice}</p>
+                </div>
               </div>
             </div>
           </div>

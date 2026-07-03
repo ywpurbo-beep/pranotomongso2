@@ -40,4 +40,12 @@ export interface AiAnalysisResult {
   localWisdom: string;
   agriculturalAdvice: string;
   javaneseProverb: string;
+  
+  // New rich contextual fields
+  phenomenaExplanation: string;
+  forecastPhenomena: string;
+  thingsToObserve: string[];
+  recommendedAction: string;
+  riskWarning: string;
+  scientificTraditionalConnection: string;
 }
