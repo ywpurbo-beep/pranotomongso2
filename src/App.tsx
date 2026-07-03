@@ -3,6 +3,7 @@ import {
   Compass, 
   Wind, 
   Cloud, 
+  CloudSun,
   Bird, 
   Leaf, 
   Calendar, 
@@ -245,14 +246,23 @@ export default function App() {
   };
 
   // Helper to filter observations for the rapid visual tiles
-  const getLatestObservationForCategory = (cat: 'angin' | 'awan' | 'hewan' | 'tanaman' | 'air') => {
+  const getLatestObservationForCategory = (cat: 'cuaca' | 'hewan' | 'tanaman' | 'air') => {
     return observations.find(o => o.category === cat);
+  };
+
+  const getCategoryDisplayLabel = (cat: string) => {
+    switch (cat) {
+      case 'cuaca': return 'Langit & Cuaca';
+      case 'hewan': return 'Satwa';
+      case 'tanaman': return 'Flora';
+      case 'air': return 'Air & Hidrologi';
+      default: return cat;
+    }
   };
 
   const getCategoryColor = (cat: string) => {
     switch (cat) {
-      case 'angin': return 'sky';
-      case 'awan': return 'blue';
+      case 'cuaca': return 'sky';
       case 'hewan': return 'amber';
       case 'tanaman': return 'emerald';
       case 'air': return 'cyan';
@@ -262,8 +272,7 @@ export default function App() {
 
   const getCategoryIcon = (cat: string) => {
     switch (cat) {
-      case 'angin': return <Wind className="w-5 h-5" />;
-      case 'awan': return <Cloud className="w-5 h-5" />;
+      case 'cuaca': return <CloudSun className="w-5 h-5" />;
       case 'hewan': return <Bird className="w-5 h-5" />;
       case 'tanaman': return <Leaf className="w-5 h-5" />;
       case 'air': return <Droplets className="w-5 h-5" />;
@@ -511,9 +520,9 @@ export default function App() {
             </div>
           </div>
 
-          {/* 5 Primary Category Summary Tiles */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
-            {(['angin', 'awan', 'hewan', 'tanaman', 'air'] as const).map((cat) => {
+          {/* 4 Primary Category Summary Tiles */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            {(['cuaca', 'hewan', 'tanaman', 'air'] as const).map((cat) => {
               const latest = getLatestObservationForCategory(cat);
               return (
                 <div 
@@ -533,12 +542,12 @@ export default function App() {
                       <span className="text-[9px] font-mono text-editorial-accent font-bold uppercase tracking-widest">{cat}</span>
                     </div>
                     <h4 className="text-xs font-serif font-bold text-editorial-text capitalize mt-1.5">
-                      {latest ? latest.title : `Observasi ${cat}`}
+                      {latest ? latest.title : `Observasi ${getCategoryDisplayLabel(cat)}`}
                     </h4>
                   </div>
 
                   <p className="text-[11px] text-editorial-accent line-clamp-2 leading-relaxed">
-                    {latest ? latest.description : `Belum ada catatan ${cat} terdaftar.`}
+                    {latest ? latest.description : `Belum ada catatan ${getCategoryDisplayLabel(cat)} terdaftar.`}
                   </p>
                 </div>
               );
@@ -571,7 +580,7 @@ export default function App() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="text-sm font-serif font-bold text-editorial-text">{obs.title}</h4>
                             <span className="text-[9px] font-mono bg-white px-2 py-0.5 rounded text-editorial-accent border border-editorial-border uppercase tracking-widest font-bold">
-                              {obs.category}
+                              {getCategoryDisplayLabel(obs.category)}
                             </span>
                           </div>
                           <p className="text-xs text-editorial-text leading-relaxed font-sans font-light">

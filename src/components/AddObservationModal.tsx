@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Wind, Cloud, Bird, Leaf, Calendar, Clock, Droplets } from 'lucide-react';
+import { X, CloudSun, Bird, Leaf, Calendar, Clock, Droplets } from 'lucide-react';
 import { Observation } from '../types';
 
 interface AddObservationModalProps {
@@ -9,17 +9,16 @@ interface AddObservationModalProps {
 }
 
 export default function AddObservationModal({ isOpen, onClose, onSave }: AddObservationModalProps) {
-  const [category, setCategory] = useState<'angin' | 'awan' | 'hewan' | 'tanaman' | 'air'>('angin');
+  const [category, setCategory] = useState<'cuaca' | 'hewan' | 'tanaman' | 'air'>('cuaca');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
   if (!isOpen) return null;
 
   // Pre-fill fields or trigger suggestion titles based on category selection
-  const handleCategoryChange = (cat: 'angin' | 'awan' | 'hewan' | 'tanaman' | 'air') => {
+  const handleCategoryChange = (cat: 'cuaca' | 'hewan' | 'tanaman' | 'air') => {
     setCategory(cat);
-    if (cat === 'angin') setTitle('Arah & Kekuatan Angin');
-    else if (cat === 'awan') setTitle('Keadaan Langit & Awan');
+    if (cat === 'cuaca') setTitle('Kondisi Langit & Cuaca');
     else if (cat === 'hewan') setTitle('Gerak-gerik Satwa');
     else if (cat === 'tanaman') setTitle('Perkembangan Flora');
     else if (cat === 'air') setTitle('Kondisi Air & Hidrologi');
@@ -51,8 +50,7 @@ export default function AddObservationModal({ isOpen, onClose, onSave }: AddObse
 
   const getCategoryLabel = (cat: string) => {
     switch (cat) {
-      case 'angin': return 'Arah & Kekuatan Angin';
-      case 'awan': return 'Keadaan Langit & Awan';
+      case 'cuaca': return 'Kondisi Langit & Cuaca';
       case 'hewan': return 'Gerak-gerik Satwa';
       case 'tanaman': return 'Perkembangan Flora';
       case 'air': return 'Kondisi Air & Hidrologi';
@@ -88,75 +86,61 @@ export default function AddObservationModal({ isOpen, onClose, onSave }: AddObse
             <label className="text-[10px] font-mono font-bold tracking-widest text-editorial-accent uppercase">
               1. Pilih Kategori Sasmita (Tanda Alam)
             </label>
-            <div className="grid grid-cols-5 gap-1.5">
+            <div className="grid grid-cols-4 gap-2">
               <button
                 type="button"
-                id="cat-angin-btn"
-                onClick={() => handleCategoryChange('angin')}
-                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${
-                  category === 'angin'
+                id="cat-cuaca-btn"
+                onClick={() => handleCategoryChange('cuaca')}
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all ${
+                  category === 'cuaca'
                     ? 'bg-editorial-text border-editorial-text text-white'
                     : 'bg-editorial-card border-editorial-border text-editorial-accent hover:border-editorial-accent hover:text-editorial-text'
                 }`}
               >
-                <Wind className="w-4.5 h-4.5 mb-1" />
-                <span className="text-[9px] font-medium font-sans">Angin</span>
-              </button>
-
-              <button
-                type="button"
-                id="cat-awan-btn"
-                onClick={() => handleCategoryChange('awan')}
-                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${
-                  category === 'awan'
-                    ? 'bg-editorial-text border-editorial-text text-white'
-                    : 'bg-editorial-card border-editorial-border text-editorial-accent hover:border-editorial-accent hover:text-editorial-text'
-                }`}
-              >
-                <Cloud className="w-4.5 h-4.5 mb-1" />
-                <span className="text-[9px] font-medium font-sans">Awan</span>
+                <CloudSun className="w-5 h-5 mb-1" />
+                <span className="text-[10px] font-medium font-sans">Cuaca</span>
               </button>
 
               <button
                 type="button"
                 id="cat-hewan-btn"
                 onClick={() => handleCategoryChange('hewan')}
-                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all ${
                   category === 'hewan'
                     ? 'bg-editorial-text border-editorial-text text-white'
                     : 'bg-editorial-card border-editorial-border text-editorial-accent hover:border-editorial-accent hover:text-editorial-text'
                 }`}
               >
-                <Bird className="w-4.5 h-4.5 mb-1" />
-                <span className="text-[9px] font-medium font-sans">Satwa</span>
+                <Bird className="w-5 h-5 mb-1" />
+                <span className="text-[10px] font-medium font-sans">Satwa</span>
               </button>
 
               <button
                 type="button"
                 id="cat-tanaman-btn"
                 onClick={() => handleCategoryChange('tanaman')}
-                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all ${
                   category === 'tanaman'
                     ? 'bg-editorial-text border-editorial-text text-white'
                     : 'bg-editorial-card border-editorial-border text-editorial-accent hover:border-editorial-accent hover:text-editorial-text'
                 }`}
               >
-                <Leaf className="w-4.5 h-4.5 mb-1" />
-                <span className="text-[9px] font-medium font-sans">Flora</span>
+                <Leaf className="w-5 h-5 mb-1" />
+                <span className="text-[10px] font-medium font-sans">Flora</span>
               </button>
 
               <button
                 type="button"
                 id="cat-air-btn"
                 onClick={() => handleCategoryChange('air')}
-                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all ${
                   category === 'air'
                     ? 'bg-editorial-text border-editorial-text text-white'
                     : 'bg-editorial-card border-editorial-border text-editorial-accent hover:border-editorial-accent hover:text-editorial-text'
                 }`}
               >
-                <Droplets className="w-4.5 h-4.5 mb-1" />
-                <span className="text-[9px] font-medium font-sans">Air</span>
+                <Droplets className="w-5 h-5 mb-1" />
+                <span className="text-[10px] font-medium font-sans">Air</span>
               </button>
             </div>
           </div>

@@ -306,17 +306,17 @@ export const MANGSAS_DATA: Mangsa[] = [
 export const INITIAL_OBSERVATIONS = [
   {
     id: "obs_1",
-    category: "angin" as const,
-    title: "Arah Angin",
-    description: "Angin kencang berembus stabil ke barat daya dari arah timur laut di sore hari.",
+    category: "cuaca" as const,
+    title: "Angin & Suhu Udara",
+    description: "Angin kering berembus cukup kencang dari timur laut, hawa udara terasa mulai dingin di malam hari.",
     date: "30 Juni 2026",
     time: "16:30 WIB"
   },
   {
     id: "obs_2",
-    category: "awan" as const,
-    title: "Bentuk Awan",
-    description: "Langit cerah bersih dengan gumpalan awan cumulus tipis di kaki langit utara.",
+    category: "cuaca" as const,
+    title: "Keadaan Langit & Awan",
+    description: "Langit cerah bersih tanpa mendung dengan gumpalan awan tipis di kaki langit utara.",
     date: "30 Juni 2026",
     time: "09:00 WIB"
   },
